@@ -2,7 +2,11 @@
 
 Published verification receipts for the AIEN repositories. This repository holds data only:
 no code, no workflows, no secrets. It is the public, append-only shelf that the thin
-"AIEN Verification" check on every AIEN repository reads from.
+"AIEN Verification" check reads from. That check exists today in the nine repositories named below,
+as an advisory draft (phase 2): it is not a required check yet.
+
+No bundles are published yet. As of 2026-10-13 this repository holds only this README and the
+LICENSE.
 
 ## Layout
 
@@ -10,9 +14,9 @@ no code, no workflows, no secrets. It is the public, append-only shelf that the 
 <repo>/<sha>/bundle.json
 ```
 
-- `<repo>` is the GitHub repository name under `aien-dev` (for example `omega`,
-  `aien-sovereign-core`, `aienos`, `physics`, `aien-protocols`, `aien-architecture`,
-  `aegis-runtime`, `spark-rsi`, `benchmarks`).
+- `<repo>` is the GitHub repository name under `aien-dev`. The repositories that carry the check
+  today are `omega`, `aien-sovereign-core`, `aienos`, `physics`, `aien-protocols`,
+  `aien-architecture`, `aegis-runtime`, `spark-rsi` and `benchmarks`.
 - `<sha>` is the full 40-character commit hash of the verified commit in that repository.
 - `bundle.json` is the signed bundle produced by `aien-test bundle-sign` on the machine that
   ran the gates (the DGX Spark). It carries one receipt per gate for that exact commit, the
@@ -34,7 +38,8 @@ signed output, so anyone can read and re-verify a bundle with the public key.
 
 ## Rules
 
-- Append only. A bundle for a given `<repo>/<sha>` is published once and never rewritten.
+- Append only (a convention: the branch has no protection rule that enforces it). A bundle for a
+  given `<repo>/<sha>` is published once and never rewritten.
   A new verification of the same commit is a new commit here that must carry the same bytes.
 - No workflows run in this repository.
 - Published by the AIEN verification pipeline on the DGX Spark; see the `aien-architecture`
@@ -42,4 +47,4 @@ signed output, so anyone can read and re-verify a bundle with the public key.
 
 ## License
 
-AGPL-3.0-or-later, like every AIEN repository. See `LICENSE`.
+AGPL-3.0-or-later. See `LICENSE`.
