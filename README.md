@@ -43,7 +43,9 @@ The consuming repository verifies the bundle with `aien-test verify-bundle`, usi
 - the always-run gate list `.aien/always` from the same base branch, passed as `--require`.
 
 The signing key never leaves the verification machine. This repository only receives the
-signed output, so anyone can read and re-verify a bundle with the public key.
+signed output, so anyone can read and re-verify a bundle with the public key. [VERIFY.md](VERIFY.md)
+walks through that check with `openssl`, `jq` and `sha256sum` only, and lists what a bundle does
+and does not prove.
 
 ## Rules
 
