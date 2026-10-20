@@ -1,0 +1,158 @@
+
+== 1/7 checking this machine
+GPU NVIDIA GB10 (10de:2e12 at 000f:01:00.0), driver 580.173.02, 962 GB disk free, 56 GB memory free
+
+== 2/7 Rust 1.98.1
+error: $HOME differs from euid-obtained home directory: you may be using sudo
+error: $HOME directory: /home/drakestapleton/workspace/l182-final/home
+error: euid-obtained home directory: /home/drakestapleton
+
+  1.98.1-aarch64-unknown-linux-gnu installed - rustc 1.98.1 (48a229cea 2026-09-01)
+
+
+Rust is installed now. Great!
+
+To get started you need Cargo's bin directory 
+(/home/drakestapleton/workspace/l182-final/aien-demo/rust/cargo/bin) in your 
+PATH
+environment variable. This has not been done automatically.
+
+To configure your current shell, you need to source
+the corresponding env file under 
+/home/drakestapleton/workspace/l182-final/aien-demo/rust/cargo.
+
+Consider running the right command for your shell (note the leading DOT):
+. "/home/drakestapleton/workspace/l182-final/aien-demo/rust/cargo/env" # For 
+sh/ash/dash/pdksh
+cargo:rerun-if-env-changed=CC_aarch64-unknown-linux-gnu
+CC_aarch64-unknown-linux-gnu = None
+cargo:rerun-if-env-changed=CC_aarch64_unknown_linux_gnu
+CC_aarch64_unknown_linux_gnu = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CC_ENABLE_DEBUG_OUTPUT
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64_unknown_linux_gnu
+CFLAGS_aarch64_unknown_linux_gnu = None
+cargo:rerun-if-env-changed=CFLAGS_aarch64-unknown-linux-gnu
+CFLAGS_aarch64-unknown-linux-gnu = None
+installed inside the demo folder: cargo 1.98.1 (797e8a9bc 2026-08-05)
+
+== 3/7 sources at pinned commits
+omega-mv d2d7404153164bfbe04b99e0fea5f688638096f7
+physics-mv 6d7cf0d4d8eb2cda7b512100ff6058e25dbb3ddf
+aien-sovereign-core-mv d6942e21d0f507da10c9a111e389324d065dcf44
+
+== 4/7 building Omega and the demo (C and Rust, no CUDA toolkit)
+info: syncing channel updates for 1.98.1-aarch64-unknown-linux-gnu
+info: latest update on 2026-09-03 for version 1.98.1 (48a229cea 2026-09-01)
+info: downloading 2 components
+
+== 5/7 weights: Qwen/Qwen3.8-27B-FP8 at revision 017b9c7af6b5689d5dd426a76e0bc077eb5ca20a (Apache 2.0)
+73 of 73 files to download (about 30 GB on a first run)
+all 73 files match their published sha256
+
+== 6/7 converting to the 4-bit store (once)
+w4 store: layer 0 of 64 converted
+w4 store: layer 1 of 64 converted
+w4 store: layer 2 of 64 converted
+w4 store: layer 3 of 64 converted
+w4 store: layer 4 of 64 converted
+w4 store: layer 5 of 64 converted
+w4 store: layer 6 of 64 converted
+w4 store: layer 7 of 64 converted
+w4 store: layer 8 of 64 converted
+w4 store: layer 9 of 64 converted
+w4 store: layer 10 of 64 converted
+w4 store: layer 11 of 64 converted
+w4 store: layer 12 of 64 converted
+w4 store: layer 13 of 64 converted
+w4 store: layer 14 of 64 converted
+w4 store: layer 15 of 64 converted
+w4 store: layer 16 of 64 converted
+w4 store: layer 17 of 64 converted
+w4 store: layer 18 of 64 converted
+w4 store: layer 19 of 64 converted
+w4 store: layer 20 of 64 converted
+w4 store: layer 21 of 64 converted
+w4 store: layer 22 of 64 converted
+w4 store: layer 23 of 64 converted
+w4 store: layer 24 of 64 converted
+w4 store: layer 25 of 64 converted
+w4 store: layer 26 of 64 converted
+w4 store: layer 27 of 64 converted
+w4 store: layer 28 of 64 converted
+w4 store: layer 29 of 64 converted
+w4 store: layer 30 of 64 converted
+w4 store: layer 31 of 64 converted
+w4 store: layer 32 of 64 converted
+w4 store: layer 33 of 64 converted
+w4 store: layer 34 of 64 converted
+w4 store: layer 35 of 64 converted
+w4 store: layer 36 of 64 converted
+w4 store: layer 37 of 64 converted
+w4 store: layer 38 of 64 converted
+w4 store: layer 39 of 64 converted
+w4 store: layer 40 of 64 converted
+w4 store: layer 41 of 64 converted
+w4 store: layer 42 of 64 converted
+w4 store: layer 43 of 64 converted
+w4 store: layer 44 of 64 converted
+w4 store: layer 45 of 64 converted
+w4 store: layer 46 of 64 converted
+w4 store: layer 47 of 64 converted
+w4 store: layer 48 of 64 converted
+w4 store: layer 49 of 64 converted
+w4 store: layer 50 of 64 converted
+w4 store: layer 51 of 64 converted
+w4 store: layer 52 of 64 converted
+w4 store: layer 53 of 64 converted
+w4 store: layer 54 of 64 converted
+w4 store: layer 55 of 64 converted
+w4 store: layer 56 of 64 converted
+w4 store: layer 57 of 64 converted
+w4 store: layer 58 of 64 converted
+w4 store: layer 59 of 64 converted
+w4 store: layer 60 of 64 converted
+w4 store: layer 61 of 64 converted
+w4 store: layer 62 of 64 converted
+w4 store: layer 63 of 64 converted
+{"bytes":13599187807,"rel_rms":0.1167470966321204,"rule":"ocp","saturated":664861399,"seconds":308.212377213,"source":"6422379df210c01e","store":"/home/drakestapleton/workspace/l182-final/aien-demo/weights/qwen3.8-27b-fp8.mxfp4/aien-w4.store","tensors":257,"weights":25598361600}
+the 4-bit store is byte-identical to the reference (sha256 2a45c5376547e8762417f7944c8c17f8a8ec4fca4411208ebd6671457c8f1a69)
+
+== 7/7 answering one prompt on the GPU
+linked libraries of the demo program (no libcuda):
+  	linux-vdso.so.1
+  	libm.so.6 => /lib/aarch64-linux-gnu/libm.so.6
+  	libgcc_s.so.1 => /lib/aarch64-linux-gnu/libgcc_s.so.1
+  	libc.so.6 => /lib/aarch64-linux-gnu/libc.so.6
+  	/lib/ld-linux-aarch64.so.1
+prompt: In three sentences: why does memory bandwidth decide how fast a language model writes?
+loading the 4-bit model onto the GPU ...
+--- answer
+Large language models are memory-bound because they must repeatedly read massive parameter matrices from high-bandwidth memory for every single token generated. Since the computational units (GPUs) are often idle waiting for this data to arrive, the speed of data transfer becomes the primary bottleneck rather than raw processing power. Consequently, increasing memory bandwidth allows the GPU to fetch parameters faster, directly reducing the latency between generating one token and the next.
+--- numbers (this run, this machine)
+model load              26.6 s (13.65 GB of 4-bit weights onto the GPU)
+prompt                  28 tokens read in 2.0 s
+generation              83 tokens in 5.86 s = 14.15 tokens/s (wall clock)
+weight bytes per token  13.65 GB -> 193.2 GB/s = 70.8% of the 273 GB/s memory wall
+chip time per token     70.33 ms median = 14.22 tokens/s while the GPU works (the rest is host time between tokens)
+
+== timings (seconds)
+check 0.4
+rust 9.6
+sources 11.5
+build 138.3
+weights 299.6
+convert 315.8
+answer 11089.2
+total 11864.6
+receipt: /home/drakestapleton/workspace/l182-final/aien-demo/demo-receipt.json (compare with github.com/aien-dev/aien-receipts)
+TOTAL wall 11864.61 s

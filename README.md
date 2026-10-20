@@ -31,7 +31,11 @@ ran, not that the commit passed.
   ran the gates (the DGX Spark). It carries one receipt per gate for that exact commit, the
   verdict of each gate, and a signature over the whole bundle.
 
-Nothing else lives here. A commit that has not been verified has no directory.
+Nothing else lives here, except `demos/`. A commit that has not been verified has no directory.
+
+`demos/<demo>/<utc>/` holds the recorded output of a public demo run (script, log, timings, result
+`.json` files, `SHA256SUMS`), so a stranger who runs the same demo can compare. These are run
+records, not signed judge bundles.
 
 ## How a bundle is checked
 

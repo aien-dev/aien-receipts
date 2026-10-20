@@ -1,0 +1,9 @@
+{
+  "demo": "aien one-command 27B", "utc": "2026-10-20T18:43:22Z",
+  "omega": "d2d7404153164bfbe04b99e0fea5f688638096f7", "physics": "6d7cf0d4d8eb2cda7b512100ff6058e25dbb3ddf", "sovereign_core": "d6942e21d0f507da10c9a111e389324d065dcf44",
+  "weights": "Qwen/Qwen3.8-27B-FP8@017b9c7af6b5689d5dd426a76e0bc077eb5ca20a", "gpu": "NVIDIA GB10 (10de:2e12 at 000f:01:00.0)", "driver": "580.173.02", "kernel": "7.0.0-1019-nvidia",
+  "store_sha256": "2a45c5376547e8762417f7944c8c17f8a8ec4fca4411208ebd6671457c8f1a69", "linked": "linux-vdso.so.1 libm.so.6 libgcc_s.so.1 libc.so.6 /lib/ld-linux-aarch64.so.1",
+  "loadavg_end": "51.23 57.70 53.83", "run_sha256": "6316b9205294b44ba35e248d34684de62f803ae5625ba005832ba943ad04e14c",
+  "timings_s": {"check": 0.4, "rust": 9.6, "sources": 11.5, "build": 138.3, "weights": 299.6, "convert": 315.8, "answer": 11089.2, "total": 11864.6},
+  "answer": "answer.json"
+}
