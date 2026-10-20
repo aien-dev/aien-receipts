@@ -1,0 +1,10 @@
+loading the 4-bit model onto the GPU ...
+--- answer
+Large language models are memory-bound because they must repeatedly read massive parameter matrices from high-bandwidth memory for every single token generated. Since the computational units (GPUs) are often idle waiting for this data to arrive, the speed of data transfer becomes the primary bottleneck rather than raw processing power. Consequently, increasing memory bandwidth allows the GPU to fetch parameters faster, directly reducing the latency between generating one token and the next.
+--- numbers (this run, this machine)
+model load              82.2 s (13.65 GB of 4-bit weights onto the GPU)
+prompt                  28 tokens read in 5.4 s
+generation              83 tokens in 15.39 s = 5.39 tokens/s (wall clock)
+weight bytes per token  13.65 GB -> 73.6 GB/s = 27.0% of the 273 GB/s memory wall
+chip time per token     194.94 ms median = 5.13 tokens/s while the GPU works (the rest is host time between tokens)
+ANSWER_STEP wall 107.32 s

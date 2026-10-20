@@ -13,6 +13,7 @@ prompt answered on the GPU by Omega with no CUDA.
 | `demo-receipt.json` | pinned commits, weights revision, GPU, driver, kernel, 4-bit store sha256, linked libraries, step timings |
 | `answer.json` | the prompt, the answer, every token id, the chip time of every step, and the speed figures |
 | `timings.txt` | seconds per step |
+| `gpu-step.*` | a second, separately timed run of the GPU step only (see Timings) |
 | `SHA256SUMS` | sha256 of every file here |
 
 ## Result
@@ -30,8 +31,13 @@ Setup from nothing to the GPU step took 775.2 s, 12.9 minutes (calc:d760348d): c
 sources 11.5, build 138.3, weights 299.6, convert 315.8. The `answer` step shows 11089.2 s because on
 this shared machine the script waited about three hours in a queue for the GPU before it could start.
 A stock Spark has no such queue. The GPU work itself was 26.6 s to load the model, 2.0 s for the
-prompt and 5.9 s to write the answer (fields `open_s`, `prefill_s`, `gen_s` in `answer.json`). The
-end-to-end time of the GPU step without the queue is UNMEASURED in this bundle.
+prompt and 5.9 s to write the answer (fields `open_s`, `prefill_s`, `gen_s` in `answer.json`). 
+
+To time the GPU step without the queue, it was run once more on the same folder at 18:55Z
+(`gpu-step.sh`, `gpu-step.log`, `gpu-step-answer.json`): 107.32 s end to end, same answer. That run is a
+time bound, not a speed figure: a training job was using the GPU at the same time without the GPU
+lock, and chip time per token rose from 70.33 ms to 194.94 ms (2.77x, calc:c9dd2506). Setup plus that
+GPU step is 14.71 minutes (calc:3cb838d3).
 
 The machine was busy with other work during the run (load average 51 to 58 at the end), so the
 build, download and convert times are slower than an idle Spark would give.
