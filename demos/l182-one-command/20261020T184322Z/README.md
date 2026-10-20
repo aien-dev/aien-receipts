@@ -40,7 +40,7 @@ lock, and chip time per token rose from 70.33 ms to 194.94 ms (2.77x, calc:c9dd2
 GPU step is 14.71 minutes (calc:3cb838d3).
 
 The machine was busy with other work during the run (load average 51 to 58 at the end), so the
-build, download and convert times are slower than an idle Spark would give.
+build, download and convert times are busy-machine figures; an idle Spark is UNMEASURED.
 
 ## The test harness
 
