@@ -1,3 +1,7 @@
+<!-- github-native-navigation -->
+[Source](https://github.com/aien-dev/aien-receipts) · [Walkthrough](docs/TEACHING.md) · [Replay receipt](docs/teaching-replay-2026-10-22.txt) · [Issues](https://github.com/aien-dev/aien-receipts/issues)
+<!-- /github-native-navigation -->
+
 # aien-receipts
 
 ## How it works and how to reproduce
