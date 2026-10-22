@@ -1,0 +1,11 @@
+2026-10-22 parent fresh-checkout replay
+Source:d1b930ff37b203070aae71a83631971b741870b3 (same pinned bundle and trust key as the lesson).
+The first parent invocation used macOS /usr/bin/openssl, which is LibreSSL3.3.6, and failed loading the Ed25519 public key. This did not satisfy the already documented OpenSSL3 prerequisite. After explicitly selecting the installed OpenSSL3.6.3 binary directory in PATH, the unchanged signature and tamper checks passed from another fresh temporary checkout. No signature, trust key, bundle or verification assertion was changed.
+The guide now rejects the wrong OpenSSL family before attempting verification.
+
+Observed corrected-prerequisite output; overall exit0:
+OpenSSL 3.6.3 9 Jun 2026 (Library: OpenSSL 3.6.3 9 Jun 2026)
+Signature Verified Successfully
+80A122F601000000:error:030000EA:digital envelope routines:EVP_DigestVerify:provider signature failure:crypto/evp/m_sigver.c:785:ED25519 digest_verify:
+Signature Verification Failure
+TAMPER REFUSED

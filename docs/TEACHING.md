@@ -10,6 +10,7 @@ Prerequisites: Git, `curl`, `jq`, `xxd`, OpenSSL 3, and a network connection for
 
 ```sh
 set -eu
+openssl version | grep -q '^OpenSSL 3\.' || { echo 'This lesson requires OpenSSL 3, not the macOS LibreSSL command.' >&2; exit 1; }
 B=synapse/7b4529a8ef61c494a26ed2aa1e95a2c4728aabb2/bundle.json
 S=5b732e5d353bbcc3f6d0cd1eac60f2e543601521
 T=$(mktemp -d)
@@ -29,4 +30,11 @@ jq -cjS 'del(.signature) | .verdict="FAIL"' "$B" > "$T/tampered"
 if openssl pkeyutl -verify -pubin -inkey "$T/pub.pem" -rawin -in "$T/tampered" -sigfile "$T/sig"; then exit 1; else echo 'TAMPER REFUSED'; fi
 ```
 
-Expected: `Signature Verified Successfully`, then an OpenSSL verification failure and `TAMPER REFUSED`; overall exit 0. The key comparison and required gates are checked, but this bounded exercise is not a full `aien-test` policy replay. The independent walkthrough explains the additional checks. Never change the published source bundle to demonstrate tampering. [Raw replay receipt](teaching-replay-2026-10-22.txt).
+On macOS, `/usr/bin/openssl` may be LibreSSL even though it prints a major version3. Check `openssl version`; use the installed OpenSSL3 binary directory in `PATH` (for an existing Homebrew installation, `export PATH="$(brew --prefix openssl@3)/bin:$PATH"`). This is a prerequisite selection, not an alternate signature algorithm or a waived verification failure.
+
+Expected: `Signature Verified Successfully`, then an OpenSSL verification failure and `TAMPER REFUSED`; overall exit 0. The key comparison and required gates are checked, but this bounded exercise is not a full `aien-test` policy replay. The independent walkthrough explains the additional checks. Never change the published source bundle to demonstrate tampering. [Raw author replay](teaching-replay-2026-10-22.txt) · [Parent prerequisite replay](parent-openssl3-replay.txt).
+
+
+### Parent fresh-checkout replay
+
+A separate coordination replay is retained in [the parent receipt](parent-replay-2026-10-22.txt). Its scope and observed exit are explicit; source review and final desk qualification remain separate. A recorded absence or expected failing baseline is not a passing implementation.
