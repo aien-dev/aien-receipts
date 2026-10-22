@@ -13,7 +13,7 @@ pipeline that runs on the project's NVIDIA DGX Spark) checks a commit, it signs 
 publishes it here, so anyone can read and re-check it. This repository holds data only: no code,
 no workflows, no secrets.
 
-Supports [Aienix](https://github.com/aien-dev/aienix), the core tree of AIEN. Every claim the
+Supports [AienOS](https://github.com/aien-dev/aienix), the core tree of AIEN. Every claim the
 project makes is meant to resolve to a bundle on this shelf.
 
 **Status (2026-10-18): in use.** The first bundles were published on 2026-10-16, and the Spark
