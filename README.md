@@ -1,5 +1,9 @@
 # aien-receipts
 
+## How it works and how to reproduce
+
+I explain the signed-bundle boundary and a pinned positive and tamper check in [the worked lesson](docs/TEACHING.md). The deeper [independent verification walkthrough](VERIFY.md) came from branch `receipts/plain-verify`. [Raw replay output](docs/teaching-replay-2026-10-22.txt) records what was actually checked.
+
 Published verification receipts for the AIEN repositories. When the Spark judge (the verification
 pipeline that runs on the project's NVIDIA DGX Spark) checks a commit, it signs the result and
 publishes it here, so anyone can read and re-check it. This repository holds data only: no code,
