@@ -1,0 +1,42 @@
+TEACHING REPLAY 2026-10-22 UTC
+repository: aien-dev/aien-receipts
+base_sha: f0840f787cf284d985d9a2f76a79dce340cf34be
+source_sha: d1b930ff37b203070aae71a83631971b741870b3
+environment: macOS-26.6.2-arm64-arm-64bit-Mach-O; python 3.14.6
+tool_versions:
+git --version: git version 2.55.0
+node --version: v22.18.0
+jq --version: jq-1.7.1-apple
+openssl version: OpenSSL 3.6.3 9 Jun 2026 (Library: OpenSSL 3.6.3 9 Jun 2026)
+cargo --version: cargo 1.97.1 (c980f4866 2026-06-30)
+qualification: signature PASS, tamper refusal PASS; full gate policy and gate execution unverified
+checkout: fresh git clone --no-hardlinks --branch docs/teaching-20261022 from dedicated cohort clone
+command (from docs/TEACHING.md):
+set -eu
+B=synapse/7b4529a8ef61c494a26ed2aa1e95a2c4728aabb2/bundle.json
+S=5b732e5d353bbcc3f6d0cd1eac60f2e543601521
+T=$(mktemp -d)
+curl -fsS "https://raw.githubusercontent.com/aien-dev/synapse/$S/.aien/verify.pub" -o "$T/key"
+curl -fsS "https://raw.githubusercontent.com/aien-dev/synapse/$S/.aien/always" -o "$T/always"
+test "$(tr -d '[:space:]' < "$T/key")" = "$(jq -r '.signature.pubkey' "$B")"
+while IFS= read -r gate; do
+  case "$gate" in ''|\#*) continue;; esac
+  jq -e --arg gate "$gate" '.checks | any(.gate == $gate and .required == true and .verdict == "PASS")' "$B" >/dev/null
+done < "$T/always"
+jq -cjS 'del(.signature)' "$B" > "$T/signed"
+{ printf '302a300506032b6570032100'; tr -d '[:space:]' < "$T/key"; } | xxd -r -p > "$T/pub.der"
+openssl pkey -pubin -inform DER -in "$T/pub.der" -out "$T/pub.pem"
+jq -r '.signature.sig' "$B" | xxd -r -p > "$T/sig"
+openssl pkeyutl -verify -pubin -inkey "$T/pub.pem" -rawin -in "$T/signed" -sigfile "$T/sig"
+jq -cjS 'del(.signature) | .verdict="FAIL"' "$B" > "$T/tampered"
+if openssl pkeyutl -verify -pubin -inkey "$T/pub.pem" -rawin -in "$T/tampered" -sigfile "$T/sig"; then exit 1; else echo 'TAMPER REFUSED'; fi
+
+stdout:
+Signature Verified Successfully
+Signature Verification Failure
+TAMPER REFUSED
+
+stderr:
+80A122F601000000:error:030000EA:digital envelope routines:EVP_DigestVerify:provider signature failure:crypto/evp/m_sigver.c:785:ED25519 digest_verify:
+
+exit: 0
