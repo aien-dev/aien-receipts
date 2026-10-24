@@ -31,7 +31,8 @@ ran, not that the commit passed.
   ran the gates (the DGX Spark). It carries one receipt per gate for that exact commit, the
   verdict of each gate, and a signature over the whole bundle.
 
-Nothing else lives here. A commit that has not been verified has no directory.
+Bundle directories contain published data; documentation explains how to inspect it.
+A commit that has not been verified has no directory.
 
 ## How a bundle is checked
 
@@ -44,6 +45,23 @@ The consuming repository verifies the bundle with `aien-test verify-bundle`, usi
 
 The signing key never leaves the verification machine. This repository only receives the
 signed output, so anyone can read and re-verify a bundle with the public key.
+
+## How it works / How we built it
+
+The [pipeline design record](https://github.com/aien-dev/aien-architecture/blob/efbba982f5c095e3ae71c057b22faaafc11ed84d/docs/adr/0033-aien-verification-pipeline.md)
+identifies the problem: repeated hosted setup and hardware tests that need Spark.
+The worker publishes a signed, commit-bound bundle; an independent consumer uses
+base-branch trust anchors to check it rather than trusting the candidate's own key
+or gate list. The signature authenticates the recorded statement, not the
+correctness or sufficiency of the underlying tests.
+
+**[Walk through one immutable real bundle](docs/verify-one-bundle.md)**: exact
+source, shelf and verifier pins; base-ref public key and gate list; official
+`aien-test verify-bundle` commands; and a disposable tamper/refusal case. It links
+the implementation and existing tests. The optional OpenSSL signature-only
+exercise was reproduced; the full verifier recipe is explicitly **not yet
+reproduced** in the documentation review environment because Cargo is unavailable.
+Neither a signature-only check nor a green hosted bridge replaces the Spark verdict.
 
 ## Rules
 
