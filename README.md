@@ -56,4 +56,4 @@ signed output, so anyone can read and re-verify a bundle with the public key.
 
 ## License
 
-AGPL-3.0-or-later. See `LICENSE`.
+Apache-2.0. See `LICENSE`.
