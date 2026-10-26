@@ -28,7 +28,7 @@ suites() { # TREE: run every suite present in the tree, one at a time
 	fi
 }
 
-for ref in "$tested" audit/tls-proof audit/tls-fipsmodule audit/tls-approvedmode; do
+for ref in "$tested" audit/tls-proof audit/tls-fipsmodule audit/tls-approvedmode audit/tls-fips-approved; do
 	d="$work/tree-$(echo "$ref" | tr / -)"
 	[ -d "$d" ] || git clone -q "$url" "$d"
 	git -C "$d" fetch -q origin "$ref" 2>/dev/null || true
