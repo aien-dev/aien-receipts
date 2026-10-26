@@ -8,16 +8,18 @@ no workflows, no secrets.
 Supports [Aienix](https://github.com/aien-dev/aienix), the core tree of AIEN. Every claim the
 project makes is meant to resolve to a bundle on this shelf.
 
-**Status (2026-10-18): in use.** The first bundles were published on 2026-10-16, and the Spark
-adds new ones as it verifies commits. Repositories with bundles here today:
-`aegis-runtime`, `aien-architecture`, `aienos`, `aien-protocols`, `aien-sovereign-core`,
-`benchmarks`, `omega` and `physics`. In `aegis-runtime`, `aien-architecture`, `aienos`,
-`aien-protocols`, `benchmarks`, `omega`, `physics` and `spark-rsi` the "AIEN Verification" check
-is now required before a pull request can merge.
+**Status (2026-10-26): in use.** The first bundles were published on 2026-10-16, and
+the Spark publishes signed bundles when it verifies commits. The shelf includes
+historical receipts for `aegis-runtime`, `aien-architecture`, `aienos`,
+`aien-protocols`, `benchmarks`, `omega`, `physics` and other enrolled repositories;
+the presence of a bundle for an older commit says nothing about current
+qualification or merge authorization.
 
-The verdict of record is the Spark's commit status "AIEN Verification (Spark)". A hosted check
-run with the similar name "AIEN Verification" only bridges to it: green there means the bridge
-ran, not that the commit passed.
+Since the 2026-10-24 policy change, the hosted **AIEN Checks** job on PRs and
+`main` is advisory and runs portable smoke gates; it does not read this shelf.
+Only the **AIEN Alpha** job on an `alpha/*` tag requires a full signed Spark
+bundle for the tagged commit on `main`. The earlier `AIEN Verification` hosted
+receipt bridge and required-PR-check policy are historical, not current.
 
 ## Layout
 
@@ -61,7 +63,7 @@ source, shelf and verifier pins; base-ref public key and gate list; official
 the implementation and existing tests. The optional OpenSSL signature-only
 exercise was reproduced; the full verifier recipe is explicitly **not yet
 reproduced** in the documentation review environment because Cargo is unavailable.
-Neither a signature-only check nor a green hosted bridge replaces the Spark verdict.
+Neither a signature-only check nor a green advisory PR check replaces the full signed Alpha verdict.
 
 ## Rules
 
