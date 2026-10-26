@@ -39,7 +39,7 @@ SHA-256 commitment; their stamps are self-reported, because nobody outside can r
 | C2 | root LICENSE, SPDX headers and package-manifest licence fields agree (by licence family) | checks.py |
 | C3 | home paths, private and CGNAT IPv4 addresses, non-noreply e-mail addresses (e-mail and IP values hashed in the output) | checks.py |
 | C4 | relative Markdown links resolve at the commit | checks.py |
-| C5 | static analysis | semgrep with pinned rules (`tools/semgrep-config.yaml`) |
+| C5 | static analysis | semgrep with rules pinned by commit (config rebuilt by `tools/semgrep_config.py`, SHA-256 in the lock) |
 | C6 | GitHub workflow hygiene | actionlint, zizmor |
 | C8 | status words (PASS, QUALIFIED, DEPLOYED ...) with nothing cited on the same line | checks.py |
 | C9 | committed crumb data equals what `crumb compile` writes | crumb, built from pinned source |
