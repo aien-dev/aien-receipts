@@ -31,7 +31,7 @@ import loc  # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 TEXT_LIMIT = 2_000_000  # bytes; larger blobs are scanned by gitleaks only
-CHECKER_VERSION = "aien-audit-checks/2"
+CHECKER_VERSION = "aien-audit-checks/3"
 LOCK_PATH = os.path.join(HERE, "tools.lock.json")
 
 
@@ -146,25 +146,55 @@ LICENSE_SIGS = [
     ("Unlicense", r"This is free and unencumbered software"),
     ("CC-BY-4.0", r"Creative Commons Attribution 4\.0"),
     ("CC0-1.0", r"CC0 1\.0 Universal"),
-    ("BSD-2-Clause-Patent", r"BSD-2-Clause-Patent|SPDX-License-Identifier: BSD-2-Clause-Patent"),
+    ("BSD-2-Clause-Patent", r"BSD-2-Clause-Patent"),
+    ("Community-Spec-1.0", r"Community Specification License 1\.0"),
 ]
-SPDX_RE = re.compile(r"SPDX-License-Identifier:\s*([A-Za-z0-9.+\-() ]+?)\s*(?:\*/|-->|$)", re.M)
+# An SPDX expression: ids joined by AND/OR/WITH (either case), optional parens, ending the line or
+# comment. Prose that merely mentions the tag ("... GPL-2.0-only and remain under") does not match.
+_SPDX_ID = r"\(*[A-Za-z0-9.+\-]+\)*"
+SPDX_RE = re.compile(r"SPDX-License-Identifier:\s*(" + _SPDX_ID + r"(?:\s+(?:AND|OR|WITH|and|or|with)\s+"
+                     + _SPDX_ID + r")*)\s*(?:\*/|-->|$)", re.M)
 CARGO_RE = re.compile(r'^\s*license\s*=\s*"([^"]+)"', re.M)
+LICENSE_FILE_RE = re.compile(r"(?i)^((LICEN[SC]E|COPYING|UNLICENSE)([.-].*)?|.+\.LICEN[SC]E)$")
 
 
 def ident(text):
-    for name, rx in LICENSE_SIGS:
-        if re.search(rx, text, re.I):
-            return name
-    return "UNRECOGNIZED"
+    """Name the licence a licence file grants: an SPDX expression it declares in its first 1 KB wins;
+    otherwise the signature that appears EARLIEST in the text (a GPL text mentions the LGPL further down,
+    a dual-licence file names both). A file that opens with its own versioned licence title before the
+    first known signature (a custom licence wrapping Apache text) is UNRECOGNIZED, not the wrapped licence."""
+    m = SPDX_RE.search(text[:1000])
+    if m:
+        return m.group(1).strip()
+    text = re.sub(r"\s+", " ", text)  # reflowed licence text (license.rst) still matches its signature
+    hits = [(mm.start(), name) for name, rx in LICENSE_SIGS for mm in [re.search(rx, text, re.I)] if mm]
+    if not hits:
+        return "UNRECOGNIZED"
+    start, name = min(hits)
+    if re.search(r"\bLicen[sc]e,?\s+(v(ersion)?\.?\s*)?\d", text[:start], re.I):
+        return "UNRECOGNIZED"
+    return name
+
+
+def families(expr):
+    return set(re.findall(r"[A-Za-z0-9.\-+]+", expr)) - {"OR", "AND", "WITH", "or", "and", "with"}
 
 
 def c2(ctx):
-    root_lic = {}
-    for p in sorted(ctx.cats):
-        if "/" not in p and re.match(r"(?i)^(LICEN[SC]E|COPYING|UNLICENSE)([.-].*)?$", p):
-            with open(os.path.join(ctx.root, p), "rb") as fh:
-                root_lic[p] = ident(fh.read().decode("utf-8", "replace"))
+    # Licence files are read from the audited commit itself, not from the scanned file set: in fork-diff mode
+    # the upstream LICENSE is unchanged, so it is outside the diff but still governs the tree. A licence file
+    # in a subdirectory (adapters/x/LICENSE, om/tka/tailscale.LICENSE) also governs the files below it.
+    root_lic, dir_lic = {}, {}
+    for _mode, typ, _oid, p in loc.tree_entries(ctx.gd, ctx.sha):
+        base = p.rsplit("/", 1)[-1]
+        if typ != "blob" or not LICENSE_FILE_RE.match(base):
+            continue
+        name = ident(loc.git(ctx.gd, "cat-file", "blob", "%s:%s" % (ctx.sha, p)).decode("utf-8", "replace"))
+        if "/" not in p:
+            if not base.lower().endswith(".license"):
+                root_lic[p] = name
+        elif name != "UNRECOGNIZED":
+            dir_lic.setdefault(p.rsplit("/", 1)[0], set()).update(families(name))
     spdx, manifests = {}, {}
     for p, t in ctx.texts(("first_party",)):
         for m in SPDX_RE.finditer(t[:4000]):
@@ -184,33 +214,49 @@ def c2(ctx):
             m = re.search(r'^\s*license\s*=\s*(?:\{\s*text\s*=\s*)?"([^"]+)"', t, re.M)
             if m:
                 manifests.setdefault(m.group(1), []).append(p)
-    declared = set(root_lic.values())
+    declared = set()
+    for name in root_lic.values():
+        if name != "UNRECOGNIZED":
+            declared |= families(name)
     items = []
     if not root_lic:
         items.append({"kind": "no-root-license"})
     for name, f in sorted(root_lic.items()):
-        if f == "UNRECOGNIZED":
+        # LICENSE/COPYING itself must be recognized; an extra root file (License-History.txt) only matters
+        # when nothing at the root is recognized.
+        stem = name.rsplit(".", 1)[0].upper()
+        if f == "UNRECOGNIZED" and (stem in ("LICENSE", "LICENCE", "COPYING") or not declared):
             items.append({"kind": "unrecognized-root-license", "file": name})
 
-    def compatible(expr):
-        toks = set(re.findall(r"[A-Za-z0-9.\-+]+", expr)) - {"OR", "AND", "WITH"}
-        for d in declared:
+    def governing(path):
+        found = set(declared)
+        parts = path.split("/")[:-1]
+        for i in range(1, len(parts) + 1):
+            found |= dir_lic.get("/".join(parts[:i]), set())
+        return found
+
+    def compatible(expr, path):
+        toks = families(expr)
+        for d in governing(path):
             for tk in toks:
                 if tk.upper().startswith(d.upper().split("-")[0]):
                     return True
         return False
 
     for expr, ps in sorted(spdx.items()):
-        if not compatible(expr):
-            items.append({"kind": "spdx-differs-from-root", "spdx": expr, "files": len(ps), "examples": sorted(ps)[:5]})
+        bad = sorted(p for p in ps if not compatible(expr, p))
+        if bad:
+            items.append({"kind": "spdx-differs-from-root", "spdx": expr, "files": len(bad), "examples": bad[:5]})
     for expr, ps in sorted(manifests.items()):
-        if not compatible(expr):
-            items.append({"kind": "manifest-differs-from-root", "license": expr, "files": sorted(ps)[:10]})
+        bad = sorted(p for p in ps if not compatible(expr, p))
+        if bad:
+            items.append({"kind": "manifest-differs-from-root", "license": expr, "files": bad[:10]})
     summary = {"root": root_lic, "spdx": {k: len(v) for k, v in sorted(spdx.items())},
-               "manifests": {k: len(v) for k, v in sorted(manifests.items())}}
+               "manifests": {k: len(v) for k, v in sorted(manifests.items())},
+               "nested": {d: sorted(v) for d, v in sorted(dir_lic.items())}}
     payload = {"items": items, "summary": summary}
     r, norm = result("C2-license", "checks.py", CHECKER_VERSION,
-                     "root LICENSE text signature vs SPDX headers (first 4 KB) vs Cargo.toml/package.json/pyproject license",
+                     "root and nested LICENSE text signatures vs SPDX headers (first 4 KB) vs Cargo.toml/package.json/pyproject license",
                      items, payload=payload,
                      note="heuristic match by license family; mismatches are decisions for the owner, not proof of violation")
     r["summary"] = summary
@@ -280,10 +326,13 @@ def c3(ctx):
 
 # C4: internal relative links in Markdown ------------------------------------------------------
 MD_LINK = re.compile(r"\[[^\]]*\]\(\s*<?([^)\s>]+)>?(?:\s+\"[^\"]*\")?\s*\)")
+INLINE_CODE = re.compile(r"`[^`]*`")
 
 
 def c4(ctx):
-    tracked = set(ctx.cats) | set(ctx.extra_paths)
+    # Targets resolve against every path in the audited commit, not only the scanned set: in fork-diff mode
+    # a link from our file may point at an unchanged upstream file.
+    tracked = {e[3] for e in loc.tree_entries(ctx.gd, ctx.sha)}
     dirs = set()
     for p in tracked:
         parts = p.split("/")
@@ -300,7 +349,8 @@ def c4(ctx):
                 continue
             if in_code:
                 continue
-            for m in MD_LINK.finditer(line):
+            # inline code spans are not links (`alloc[T](n)` is call syntax); "[`x`](y)" keeps its target
+            for m in MD_LINK.finditer(INLINE_CODE.sub("", line)):
                 tgt = m.group(1)
                 if re.match(r"^[a-z][a-z0-9+.-]*:", tgt, re.I) or tgt.startswith("#") or tgt.startswith("//"):
                     continue
@@ -320,7 +370,7 @@ def c4(ctx):
                     items.append({"file": p, "line": n, "target": tgt, "reason": "not in tree"})
     items.sort(key=lambda i: (i["file"], i["line"], i["target"]))
     return result("C4-internal-links", "checks.py", CHECKER_VERSION,
-                  "Markdown relative links resolved against the commit's tree (code fences skipped)", items,
+                  "Markdown relative links resolved against the commit's tree (code fences and inline code skipped)", items,
                   note="external URLs are not checked here (not reproducible)")
 
 

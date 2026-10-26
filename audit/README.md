@@ -51,9 +51,12 @@ error); it never counts as a pass.
 
 ## Coverage on 2026-10-26
 
-No stamp is published yet. The table is the state of the working run behind the first stamps:
-checker `aien-audit-checks/2`, each repository at its default-branch HEAD on 2026-10-26.
-P = PASS, F = FLAGGED, I = INCOMPLETE, N = NOT_RUN.
+No stamp is published yet. The table is the state of the working run behind the first stamps,
+each repository at its default-branch HEAD on 2026-10-26: C2 and C4 from checker
+`aien-audit-checks/3` (nested licences, SPDX header grammar, full-tree link resolution), every
+other column from `aien-audit-checks/2`. P = PASS, F = FLAGGED, I = INCOMPLETE, N = NOT_RUN.
+A FLAGGED cell is raw tool output; per-item triage (false positive, accepted, defect, patched)
+happens before a stamp and is recorded in the stamp, not in this table.
 
 | Repository | Kind | Commit | C1 | C2 | C3 | C4 | C5 | C6 | C8 | C9 | C11 | Model review |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -83,21 +86,21 @@ P = PASS, F = FLAGGED, I = INCOMPLETE, N = NOT_RUN.
 | cortex-rs | ARCHIVED | `3f9365fb37f1` | P | P | F | P | I | F | F | P | F | NONE |
 | crumb-spec-mv | ARCHIVED | `e2dc22ea78df` | P | P | F | P | F | F | F | F | F | NONE |
 | CUDApp | FIRST-PARTY | `780a0af1f08c` | P | F | F | P | I | P | F | P | P | PARTIAL: one reviewer pass (CudaAuditFable, report outside this repo); paired security-reviewer pass has no report |
-| edk2 | UPSTREAM-FORK | `d7d4f09ff815` | P | F | P | P | P | P | P | P | P | NONE |
+| edk2 | UPSTREAM-FORK | `d7d4f09ff815` | P | P | P | P | P | P | P | P | P | NONE |
 | edk2-non-osi | UPSTREAM-FORK | `2f029c7fdd3e` | P | F | P | P | P | P | P | P | P | NONE |
-| edk2-platforms | UPSTREAM-FORK | `8e1779b538bc` | P | F | P | P | P | P | P | P | P | NONE |
+| edk2-platforms | UPSTREAM-FORK | `8e1779b538bc` | P | P | P | P | P | P | P | P | P | NONE |
 | encounter | ARCHIVED | `4937786098a2` | P | F | P | P | P | P | P | P | P | NONE |
 | harvester | ARCHIVED | `0fa381acd0cf` | P | P | F | P | F | F | F | P | F | NONE |
-| interplane-mv | FIRST-PARTY | `1de1b0065b2e` | F | F | F | P | I | F | F | P | F | NONE |
+| interplane-mv | FIRST-PARTY | `1de1b0065b2e` | F | P | F | P | I | F | F | P | F | NONE |
 | interplane.io | FIRST-PARTY | `62d5b27beea1` | P | P | P | P | P | P | F | F | F | NONE |
 | mobhub | FIRST-PARTY | `5e1130654715` | F | P | F | P | P | P | F | F | F | NONE |
-| MojoLlama | ARCHIVED | `249949d1c3fe` | P | P | F | F | I | F | P | P | F | NONE |
-| odysseus | UPSTREAM-FORK | `27764b0c8b26` | P | F | F | F | I | P | P | P | P | NONE |
+| MojoLlama | ARCHIVED | `249949d1c3fe` | P | P | F | P | I | F | P | P | F | NONE |
+| odysseus | UPSTREAM-FORK | `27764b0c8b26` | P | P | F | P | I | P | P | P | P | NONE |
 | omega-bridge | FIRST-PARTY | `358c50510579` | P | P | F | P | I | P | F | P | P | NONE |
 | omega-harness | FIRST-PARTY | `eb07daf4ae9a` | P | P | P | P | P | P | P | P | P | NONE |
 | omega-mv | FIRST-PARTY | `77ebd3fd5910` | F | F | F | P | I | F | F | F | P | NONE |
 | omega-projects | FIRST-PARTY | `4f405e1093b9` | P | P | P | P | P | P | P | P | P | NONE |
-| omnet | FIRST-PARTY | `83f605b14720` | F | F | F | F | I | P | P | P | N | NONE |
+| omnet | FIRST-PARTY | `83f605b14720` | F | P | F | F | I | P | P | P | N | NONE |
 | omtex | FIRST-PARTY | `9071a0685922` | P | P | P | P | I | P | F | P | P | NONE |
 | open-humanity | FIRST-PARTY | `38c0c1c48de5` | F | P | F | F | F | P | F | P | F | NONE |
 | physics-mv | FIRST-PARTY | `8e92aa629c94` | P | P | F | P | I | F | F | P | P | NONE |
@@ -105,7 +108,7 @@ P = PASS, F = FLAGGED, I = INCOMPLETE, N = NOT_RUN.
 | pi-register | FIRST-PARTY | `4935b8a03ca9` | P | P | F | P | P | P | P | F | P | NONE |
 | rad-id-sync | ARCHIVED | `235666135afd` | F | P | F | P | F | F | F | F | P | NONE |
 | readings-window | FIRST-PARTY | `c6e2ab345983` | P | P | P | P | P | P | P | F | P | NONE |
-| rpi5-uefi | UPSTREAM-FORK | `da0cceee29ed` | P | F | P | F | P | P | P | P | P | NONE |
+| rpi5-uefi | UPSTREAM-FORK | `da0cceee29ed` | P | F | P | P | P | P | P | P | P | NONE |
 | sovereign-intelligence | FIRST-PARTY | `75662d15ff53` | F | P | F | P | I | F | F | P | P | NONE |
 | spark-adapters | ARCHIVED | `edd9aa10c0ed` | P | P | F | P | F | F | F | P | P | NONE |
 | spark-connector | FIRST-PARTY | `c25797453076` | P | P | P | P | P | P | P | P | P | NONE |
@@ -117,15 +120,15 @@ P = PASS, F = FLAGGED, I = INCOMPLETE, N = NOT_RUN.
 | spark-rsi-mv | FIRST-PARTY | `fc13d3f77e6c` | F | P | F | F | I | F | F | P | F | NONE |
 | spark-supervisor | FIRST-PARTY | `371ffbebfbd8` | P | F | F | P | F | F | F | P | P | NONE |
 | synapse | FIRST-PARTY | `099a980fedab` | F | P | F | P | I | F | F | P | P | NONE |
-| t3code | UPSTREAM-FORK | `ecad5ad8fe45` | P | F | F | F | P | P | P | P | F | NONE |
-| translate | UPSTREAM-FORK | `7e7c982ebc03` | P | F | P | P | P | F | P | P | P | NONE |
+| t3code | UPSTREAM-FORK | `ecad5ad8fe45` | P | P | F | P | P | P | P | P | F | NONE |
+| translate | UPSTREAM-FORK | `7e7c982ebc03` | P | P | P | P | P | F | P | P | P | NONE |
 | private-01 | FIRST-PARTY | — | P | F | F | P | F | P | P | P | P | NONE |
 | private-02 | FIRST-PARTY | — | P | P | F | P | I | P | P | P | P | NONE |
 | private-03 | FIRST-PARTY | — | F | F | F | P | P | P | P | P | P | NONE |
 | private-04 | FIRST-PARTY | — | P | F | F | P | I | P | P | P | P | NONE |
 | private-05 | FIRST-PARTY | — | P | F | F | P | I | P | F | F | P | NONE |
 | private-06 | FIRST-PARTY | — | P | P | F | P | F | P | F | P | P | NONE |
-| private-07 | FIRST-PARTY | — | P | F | P | P | I | P | F | P | P | PARTIAL: one reviewer pass, report private; no security-reviewer report |
+| private-07 | FIRST-PARTY | — | P | P | P | P | I | P | F | P | P | PARTIAL: one reviewer pass, report private; no security-reviewer report |
 | private-08 | FIRST-PARTY | — | P | P | F | P | I | P | P | P | P | NONE |
 | private-09 | FIRST-PARTY | — | F | P | F | P | I | P | F | P | P | NONE |
 | private-10 | FIRST-PARTY | — | F | P | F | P | I | P | P | P | P | NONE |

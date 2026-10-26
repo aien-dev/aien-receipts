@@ -80,6 +80,85 @@ class TestCheckerHardening(Base):
         with open(os.path.join(out, "C2-license.json"), "rb") as fh:
             self.assertEqual(hashlib.sha256(fh.read()).hexdigest(), c["output_sha256"])
 
+    def test_fork_root_license_outside_diff_is_seen(self):
+        repo = os.path.join(self.tmp, "fork")
+        base = make_repo(repo, {"License.txt": "Apache License, Version 2.0\n", "up.c": "int x;\n"})
+        head = commit(repo, {"ours.c": "int y;\n"})
+        doc = checks.run_all(repo, head, "f", os.path.join(self.tmp, "out-fork"), fork_base=base,
+                             tools=self.tools, only="C2", lock_path=self.lock_path)
+        c2 = {c["check"]: c for c in doc["checks"]}["C2-license"]
+        self.assertEqual(c2["summary"]["root"], {"License.txt": "Apache-2.0"})
+        self.assertEqual(c2["status"], "PASS")
+        # negative control: no licence anywhere in the tree is still flagged
+        bare = os.path.join(self.tmp, "bare")
+        sha = make_repo(bare, {"a.c": "int z;\n"})
+        doc, by, out = self.run_checks(bare, sha, "C2")
+        self.assertEqual(by["C2-license"]["status"], "FLAGGED")
+
+    def test_license_signature_survives_reflow(self):
+        self.assertEqual(checks.ident("Redistribution and use in source\n   and binary forms"), "BSD")
+        self.assertEqual(checks.ident("See docs/license.rst"), "UNRECOGNIZED")  # negative control
+
+    def test_license_ident_takes_spdx_and_earliest_signature(self):
+        dual = ("x is dual-licensed\nSPDX-License-Identifier: MIT OR GPL-2.0-only\n\nMIT License\n"
+                "Permission is hereby granted, free of charge\nGNU GENERAL PUBLIC LICENSE\n"
+                "use the GNU Lesser General Public License instead\n")
+        self.assertEqual(checks.ident(dual), "MIT OR GPL-2.0-only")
+        gpl = "GNU GENERAL PUBLIC LICENSE\nVersion 2\n... use the GNU Lesser General Public License instead.\n"
+        self.assertEqual(checks.ident(gpl), "GPL")  # list order would have said LGPL
+        self.assertEqual(checks.ident("Apache License\nVersion 2.0, January 2004\n"), "Apache-2.0")
+
+    def test_spdx_tag_quoted_in_prose_is_not_a_header(self):
+        prose = "They carry SPDX-License-Identifier: GPL-2.0-only and remain under\nGPL-2.0-only.\n"
+        self.assertEqual(checks.SPDX_RE.findall(prose), [])
+        self.assertEqual(checks.SPDX_RE.findall("/* SPDX-License-Identifier: GPL-2.0-only */\n"),
+                         ["GPL-2.0-only"])  # negative control: a real header still parses
+        self.assertEqual(checks.SPDX_RE.findall("# SPDX-License-Identifier: (MIT OR Apache-2.0) AND BSD-3-Clause\n"),
+                         ["(MIT OR Apache-2.0) AND BSD-3-Clause"])
+        self.assertEqual(checks.SPDX_RE.findall("// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception\n"),
+                         ["Apache-2.0 WITH LLVM-exception"])
+
+    def test_custom_license_wrapping_apache_text_is_unrecognized(self):
+        wrapper = ("Sovereign Resource Commons License 1.0 (SRCL-1.0)\nAll rights reserved.\n"
+                   "Licensed under the Apache License, Version 2.0 subject to conditions precedent.\n")
+        self.assertEqual(checks.ident(wrapper), "UNRECOGNIZED")
+        self.assertEqual(checks.ident("MIT License\nCopyright (c) 2026 X\nPermission is hereby granted, free of charge"),
+                         "MIT")  # negative control: an unversioned title before the signature is not a wrapper
+        repo = os.path.join(self.tmp, "wrapper")
+        sha = make_repo(repo, {"LICENSE": wrapper, "License-History.txt": "old terms\n",
+                               "Cargo.toml": '[package]\nlicense = "SRCL-1.0"\n'})
+        doc, by, out = self.run_checks(repo, sha, "C2")
+        with open(os.path.join(out, "C2-license.json")) as fh:
+            kinds = [i["kind"] for i in json.load(fh)["items"]]
+        self.assertEqual(kinds, ["unrecognized-root-license", "unrecognized-root-license", "manifest-differs-from-root"])
+
+    def test_nested_license_governs_its_subtree(self):
+        agpl = "GNU AFFERO GENERAL PUBLIC LICENSE\n"
+        repo = os.path.join(self.tmp, "nested")
+        sha = make_repo(repo, {"LICENSE": "Apache License, Version 2.0\n",
+                               "adapters/a/LICENSE": agpl,
+                               "adapters/a/Cargo.toml": '[package]\nlicense = "AGPL-3.0-or-later"\n',
+                               "tools/b/Cargo.toml": '[package]\nlicense = "AGPL-3.0-or-later"\n'})
+        doc, by, out = self.run_checks(repo, sha, "C2")
+        with open(os.path.join(out, "C2-license.json")) as fh:
+            items = json.load(fh)["items"]
+        # adapters/a is covered by its own LICENSE; tools/b is the negative control
+        self.assertEqual(items, [{"kind": "manifest-differs-from-root", "license": "AGPL-3.0-or-later",
+                                  "files": ["tools/b/Cargo.toml"]}])
+
+    def test_fork_link_to_unchanged_upstream_file_resolves(self):
+        repo = os.path.join(self.tmp, "fork")
+        base = make_repo(repo, {"docs/guide.md": "# g\n"})
+        head = commit(repo, {"NOTES.md": "[g](docs/guide.md) [gone](docs/missing.md) `alloc[T](n)`\n"
+                                         "See [`docs/also-gone.md`](docs/also-gone.md).\n"})
+        doc = checks.run_all(repo, head, "f", os.path.join(self.tmp, "out-fork4"), fork_base=base,
+                             tools=self.tools, only="C4", lock_path=self.lock_path)
+        c4 = {c["check"]: c for c in doc["checks"]}["C4-internal-links"]
+        with open(os.path.join(self.tmp, "out-fork4", "C4-internal-links.json")) as fh:
+            targets = [i["target"] for i in json.load(fh)]
+        self.assertEqual(targets, ["docs/missing.md", "docs/also-gone.md"])  # missing links are the negative control
+        self.assertEqual(c4["count"], 2)
+
     def test_missing_scanner_is_not_run(self):
         repo = os.path.join(self.tmp, "repo")
         sha = make_repo(repo, {"Cargo.lock": "# lock\n"})
