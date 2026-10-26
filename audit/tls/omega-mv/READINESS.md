@@ -11,7 +11,7 @@ agreed. GAP is work we can do ourselves. BLOCKER needs money, a signature or an 
 | 3 | Approved DRBG (SP 800-90A HMAC_DRBG) | READY (draft) | `DRBG PASS vectors=810 (acvp=90, cavp=720) api=23 mutants=13/13` (draft omega-mv#846, MEASURED) |
 | 4 | Approved-only mode that refuses ChaCha20 and X25519 | READY (draft) | omega-mv#847 interop rows and mutants (`TLS PASS … interop=57 … mutants=34/34`, MEASURED) |
 | 5 | Pre-operational / conditional self-tests and latched error state | READY (draft) | `FIPS PASS checks=45 drbgerr=46 kat-mutants=14/14 code-mutants=16/16` (omega-mv#846, MEASURED) |
-| 6 | DRBG and approved mode integrated (key generation from the DRBG, PCT failure enters error state) | GAP | integration branch audit/tls-fips-approved in progress; see the integrated logs once posted |
+| 6 | DRBG and approved mode integrated (key generation from the DRBG, PCT failure enters error state) | READY (draft) | omega-mv#855 at 461c607f: `FIPS PASS checks=49 drbgerr=50 ecgenerr=52 kat-mutants=14/14 code-mutants=18/18`, TLS_NET net=PASS, HTTP-CHECK PASS (MEASURED, Integrated/ logs); dudect on the new path NOT_RUN |
 | 7 | Software integrity test at start-up (FIPS 140-3 area 5) | GAP | not implemented. Reproducible build MEASURED (repro/run.log) |
 | 8 | Show-version service (area 4) | GAP | not implemented |
 | 9 | SSP zeroisation | READY, with a GAP | residue scan `RESIDUE PASS secrets=18 hs_only=12` (MEASURED); compiler does not scrub registers or spilled locals (THREAT_MODEL limit 1, GAP) |
