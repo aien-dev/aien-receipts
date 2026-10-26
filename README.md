@@ -1,9 +1,11 @@
 # aien-receipts
 
-Published verification receipts for the AIEN repositories. When the Spark judge (the verification
-pipeline that runs on the project's NVIDIA DGX Spark) checks a commit, it signs the result and
-publishes it here, so anyone can read and re-check it. This repository holds data only: no code,
-no workflows, no secrets.
+Published signed verification summaries for the AIEN repositories. When the Spark judge (the
+verification pipeline on the project's NVIDIA DGX Spark) checks a commit, it signs a bundle and
+publishes that bundle here. Readers can verify its signature, commit binding, declared gate
+verdicts and receipt digests. This shelf does **not** contain the underlying per-gate receipt
+bodies, commands, stdout, stderr or raw logs; a signature alone cannot re-run or audit the tests.
+This repository holds data only: no code, no workflows, no secrets.
 
 Supports [Aienix](https://github.com/aien-dev/aienix), the core tree of AIEN. Every claim the
 project makes is meant to resolve to a bundle on this shelf.
@@ -29,12 +31,14 @@ receipt bridge and required-PR-check policy are historical, not current.
 
 - `<repo>` is the GitHub repository name under `aien-dev`.
 - `<sha>` is the full 40-character commit hash of the verified commit in that repository.
-- `bundle.json` is the signed bundle produced by `aien-test bundle-sign` on the machine that
-  ran the gates (the DGX Spark). It carries one receipt per gate for that exact commit, the
-  verdict of each gate, and a signature over the whole bundle.
+- `bundle.json` is the signed summary bundle produced by `aien-test bundle-sign` on the machine
+  that ran the gates (the DGX Spark). It carries a receipt **digest** and verdict per gate,
+  not the full per-gate receipt or log, plus a signature over the bundle.
 
-Bundle directories contain published data; documentation explains how to inspect it.
-A commit that has not been verified has no directory.
+Only signed summary bundles are published on this shelf. Underlying gate evidence must be
+located separately in a repository's retained `evidence/` paths when published, or requested
+from the run operator when it is not public; this shelf supplies no universal artifact URL.
+Do not interpret a digest without its corresponding bytes as an independently audited gate run.
 
 ## How a bundle is checked
 
