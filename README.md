@@ -1,23 +1,27 @@
 # aien-receipts
 
-Published verification receipts for the AIEN repositories. When the Spark judge (the verification
-pipeline that runs on the project's NVIDIA DGX Spark) checks a commit, it signs the result and
-publishes it here, so anyone can read and re-check it. This repository holds data only: no code,
-no workflows, no secrets.
+Published signed verification summaries for the AIEN repositories. When the Spark judge (the
+verification pipeline on the project's NVIDIA DGX Spark) checks a commit, it signs a bundle and
+publishes that bundle here. Readers can verify its signature, commit binding, declared gate
+verdicts and receipt digests. This shelf does **not** contain the underlying per-gate receipt
+bodies, commands, stdout, stderr or raw logs; a signature alone cannot re-run or audit the tests.
+This repository holds data only: no code, no workflows, no secrets.
 
 Supports [Aienix](https://github.com/aien-dev/aienix), the core tree of AIEN. Every claim the
 project makes is meant to resolve to a bundle on this shelf.
 
-**Status (2026-10-18): in use.** The first bundles were published on 2026-10-16, and the Spark
-adds new ones as it verifies commits. Repositories with bundles here today:
-`aegis-runtime`, `aien-architecture`, `aienos`, `aien-protocols`, `aien-sovereign-core`,
-`benchmarks`, `omega` and `physics`. In `aegis-runtime`, `aien-architecture`, `aienos`,
-`aien-protocols`, `benchmarks`, `omega`, `physics` and `spark-rsi` the "AIEN Verification" check
-is now required before a pull request can merge.
+**Status (2026-10-26): in use.** The first bundles were published on 2026-10-16, and
+the Spark publishes signed bundles when it verifies commits. The shelf includes
+historical receipts for `aegis-runtime`, `aien-architecture`, `aienos`,
+`aien-protocols`, `benchmarks`, `omega`, `physics` and other enrolled repositories;
+the presence of a bundle for an older commit says nothing about current
+qualification or merge authorization.
 
-The verdict of record is the Spark's commit status "AIEN Verification (Spark)". A hosted check
-run with the similar name "AIEN Verification" only bridges to it: green there means the bridge
-ran, not that the commit passed.
+Since the 2026-10-24 policy change, the hosted **AIEN Checks** job on PRs and
+`main` is advisory and runs portable smoke gates; it does not read this shelf.
+Only the **AIEN Alpha** job on an `alpha/*` tag requires a full signed Spark
+bundle for the tagged commit on `main`. The earlier `AIEN Verification` hosted
+receipt bridge and required-PR-check policy are historical, not current.
 
 ## Layout
 
@@ -27,12 +31,14 @@ ran, not that the commit passed.
 
 - `<repo>` is the GitHub repository name under `aien-dev`.
 - `<sha>` is the full 40-character commit hash of the verified commit in that repository.
-- `bundle.json` is the signed bundle produced by `aien-test bundle-sign` on the machine that
-  ran the gates (the DGX Spark). It carries one receipt per gate for that exact commit, the
-  verdict of each gate, and a signature over the whole bundle.
+- `bundle.json` is the signed summary bundle produced by `aien-test bundle-sign` on the machine
+  that ran the gates (the DGX Spark). It carries a receipt **digest** and verdict per gate,
+  not the full per-gate receipt or log, plus a signature over the bundle.
 
-Bundle directories contain published data; documentation explains how to inspect it.
-A commit that has not been verified has no directory.
+Only signed summary bundles are published on this shelf. Underlying gate evidence must be
+located separately in a repository's retained `evidence/` paths when published, or requested
+from the run operator when it is not public; this shelf supplies no universal artifact URL.
+Do not interpret a digest without its corresponding bytes as an independently audited gate run.
 
 ## How a bundle is checked
 
@@ -61,7 +67,7 @@ source, shelf and verifier pins; base-ref public key and gate list; official
 the implementation and existing tests. The optional OpenSSL signature-only
 exercise was reproduced; the full verifier recipe is explicitly **not yet
 reproduced** in the documentation review environment because Cargo is unavailable.
-Neither a signature-only check nor a green hosted bridge replaces the Spark verdict.
+Neither a signature-only check nor a green advisory PR check replaces the full signed Alpha verdict.
 
 ## Rules
 
