@@ -7,8 +7,8 @@ verdicts and receipt digests. This shelf does **not** contain the underlying per
 bodies, commands, stdout, stderr or raw logs; a signature alone cannot re-run or audit the tests.
 This repository holds data only: no code, no workflows, no secrets.
 
-Supports [Aienix](https://github.com/aien-dev/aienix), the core tree of AIEN. Every claim the
-project makes is meant to resolve to a bundle on this shelf.
+Supports [Sovereign Intelligence (SI)](https://github.com/aien-dev/sovereign-intelligence).
+Every claim the project makes is meant to resolve to a bundle on this shelf.
 
 **Status (2026-10-26): in use.** The first bundles were published on 2026-10-16, and
 the Spark publishes signed bundles when it verifies commits. The shelf includes
